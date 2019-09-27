@@ -1,0 +1,10 @@
+Source: linux-surface-secureboot-mok
+Section: misc
+Priority: optional
+Maintainer: Maximilian Luz <luzmaximilian@gmail.com>
+Build-Depends: build-essential, debhelper (>= 10)
+
+Package: linux-surface-secureboot-mok
+Architecture: amd64
+Depends: mokutil
+Description: Secure-boot machine owner key for linux-surface kernels

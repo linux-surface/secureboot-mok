@@ -1,0 +1,68 @@
+#!/bin/bash
+set -e
+
+post_upgrade() {
+    local backup="/tmp/linux-surface-secureboot.qzed.mok.backup"
+    local original="/usr/share/linux-surface-secureboot/qzed.mok"
+
+    if ! cmp --silent "${original}" "${backup}"; then
+        # certificate has changed and needs re-enrollment
+        echo ""
+        echo "Updating secure boot certificate. The old key will be revoked and a new key"
+        echo "will be installed. You will need to reboot your system, where you will then"
+        echo "be asked to delete the old and import the new key. In both cases, make sure"
+        echo "this is the right key and confirm with the password 'surface'."
+        echo ""
+
+        local hashfile=$(mktemp)
+        mokutil --generate-hash=surface > ${hashfile}
+        mokutil --hash-file ${hashfile} --delete ${backup}
+        mokutil --hash-file ${hashfile} --import ${original}
+    fi
+
+    rm -f "${backup}"
+}
+
+post_install() {
+    local original="/usr/share/linux-surface-secureboot/qzed.mok"
+
+    echo ""
+    echo "The secure-boot certificate has been installed to"
+    echo ""
+    echo "    ${original}"
+    echo ""
+    echo "It will now be automatically enrolled for you and guarded with the password"
+    echo ""
+    echo "    surface"
+    echo ""
+
+    local hashfile=$(mktemp)
+    mokutil --generate-hash=surface > ${hashfile}
+    mokutil --hash-file ${hashfile} --import ${original}
+
+    echo "To finish the enrollment process you need to reboot, where you will then be"
+    echo "asked to enroll the certificate. During the import, you will be prompted for"
+    echo "the password mentioned above. Please make sure that you are indeed adding"
+    echo "the right key and confirm by entering 'surface'."
+    echo ""
+    echo "Note that you can always manage your secure-boot keys, including the one"
+    echo "just enrolled, from inside Linux via the 'mokutil' tool."
+    echo ""
+}
+
+configure() {
+    local backup="/tmp/linux-surface-secureboot.qzed.mok.backup"
+    local original="/usr/share/linux-surface-secureboot/qzed.mok"
+
+    if test -f "${backup}"; then
+        post_upgrade
+        exit 0
+    else
+        post_install
+        exit 0
+    fi
+}
+
+if [[ "${1}" == "configure" ]]; then
+    configure
+fi

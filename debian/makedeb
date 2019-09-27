@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+commit="f01b6e6ad3cfb495964ebab88ed0be8ced53d9dd"
+source="https://raw.githubusercontent.com/qzed/linux-surface/${commit}/keys/MOK.cer"
+
+basedir=$(dirname "${0}")
+cd "${basedir}"
+
+wget -O "MOK.cer" ${source}
+
+dpkg-buildpackage -b
+dpkg-sig --sign builder ../*.deb
