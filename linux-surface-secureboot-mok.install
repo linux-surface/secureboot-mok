@@ -1,0 +1,69 @@
+post_install() {
+    echo ""
+    echo "The secure-boot certificate has been installed to"
+    echo ""
+    echo "    /usr/share/linux-surface-secureboot/qzed.mok"
+    echo ""
+    echo "It will now be automatically enrolled for you and guarded with the password"
+    echo ""
+    echo "    surface"
+    echo ""
+
+    local hashfile=$(mktemp)
+    mokutil --generate-hash=surface > ${hashfile}
+    mokutil --hash-file ${hashfile} --import /usr/share/linux-surface-secureboot/qzed.mok
+
+    echo "To finish the enrollment process you need to reboot, where you will then be"
+    echo "asked to enroll the certificate. During the import, you will be prompted for"
+    echo "the password mentioned above. Please make sure that you are indeed adding"
+    echo "the right key and confirm by entering 'surface'."
+    echo ""
+    echo "Note that you can always manage your secure-boot keys, including the one"
+    echo "just enrolled, from inside Linux via the 'mokutil' tool."
+    echo ""
+}
+
+pre_remove() {
+    echo ""
+    echo "The following secure-boot certificate will be uninstalled and revoked from"
+    echo "your system"
+    echo ""
+    echo "    /usr/share/linux-surface-secureboot/qzed.mok"
+    echo ""
+
+    local hashfile=$(mktemp)
+    mokutil --generate-hash=surface > ${hashfile}
+    mokutil --hash-file ${hashfile} --delete /usr/share/linux-surface-secureboot/qzed.mok
+
+    echo "The key will be revoked on the next start of your system. You will then"
+    echo "again asked for the password. Enter 'surface' to confirm."
+    echo ""
+    echo "Kernels signed with the corresponding private key will still not be allowed"
+    echo "to boot after this. Note that you can always manage your secure-boot keys"
+    echo "via the 'mokutil' tool. Please refer to 'man mokutil' for more information."
+    echo ""
+}
+
+pre_upgrade() {
+    local backup="/tmp/linux-surface-secureboot.qzed.mok.backup"
+    local original="/usr/share/linux-surface-secureboot/qzed.mok"
+
+    cp "${original}" "${backup}"
+}
+
+post_upgrade() {
+    local backup="/tmp/linux-surface-secureboot.qzed.mok.backup"
+    local original="/usr/share/linux-surface-secureboot/qzed.mok"
+
+    if ! cmp --silent "${original}" "${backup}"
+    then
+        echo ""
+        echo "Updating secure boot certificate. The old key will be revoked and a new key"
+        echo "will be installed. You will need to reboot your system, where you will then"
+        echo "be asked to delete the old and import the new key. In both cases, make sure"
+        echo "this is the right key and confirm with the password 'surface'."
+        echo ""
+    fi
+
+    rm -f "${backup}"
+}
