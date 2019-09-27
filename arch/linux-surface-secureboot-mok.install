@@ -63,6 +63,11 @@ post_upgrade() {
         echo "be asked to delete the old and import the new key. In both cases, make sure"
         echo "this is the right key and confirm with the password 'surface'."
         echo ""
+
+        local hashfile=$(mktemp)
+        mokutil --generate-hash=surface > ${hashfile}
+        mokutil --hash-file ${hashfile} --delete ${backup}
+        mokutil --hash-file ${hashfile} --import ${original}
     fi
 
     rm -f "${backup}"
