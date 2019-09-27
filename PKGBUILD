@@ -1,7 +1,7 @@
 # Maintainer: Maximilian Luz <luzmaximilian@gmail.com>
 
 pkgname="linux-surface-secureboot-mok"
-pkgver=0.1.0
+pkgver=1.0.0
 pkgrel=1
 pkgdesc='Secure-boot machine owner key for linux-surface kernels'
 url='https://github.com/qzed/linux-surface'
