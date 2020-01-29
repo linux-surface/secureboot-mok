@@ -39,3 +39,47 @@ jobs:
       with:
         name: debian-latest
         path: release
+
+  arch:
+    name: Arch Linux
+    runs-on: ubuntu-latest
+    container: archlinux
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install build dependencies
+      run: |
+        pacman -Sy --noconfirm base-devel sudo fakeroot git
+
+    - name: Build package
+      run: |
+        cd arch
+
+        # Fix permissions (can't makepkg as root)
+        echo "nobody ALL=(ALL) NOPASSWD: /usr/bin/pacman" >> /etc/sudoers
+        chown -R nobody .
+
+        # Package compression settings (Matches latest Arch)
+        export PKGEXT='.pkg.tar.zst'
+        export COMPRESSZST=(zstd -c -T0 --ultra -20 -)
+
+        # Build
+        su nobody --pty -p -s /bin/bash -c 'makepkg -f --noconfirm --nodeps'
+
+    - name: Sign package
+      run: |
+        echo TODO
+
+    - name: Prepare release
+      run: |
+        mkdir release
+        # mv arch/*pkg.tar.zst{,.sig} release
+        mv arch/*pkg.tar.zst release
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: arch-latest
+        path: release
