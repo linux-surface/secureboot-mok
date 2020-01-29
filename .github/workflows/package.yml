@@ -1,0 +1,41 @@
+on:
+  push:
+    branches:
+      - feature/ci
+
+name: Build Packages
+
+jobs:
+  deb:
+    name: Debian
+    runs-on: ubuntu-latest
+    container: debian:sid
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install build dependencies
+      run: |
+        sed 's/^deb /deb-src /' /etc/apt/sources.list >> /etc/apt/sources.list
+        apt-get -y update
+        apt-get -y install build-essential debhelper dpkg-sig fakeroot wget
+
+    - name: Build package
+      run: |
+        ./debian/makedeb
+
+    - name: Sign package
+      run: |
+        echo TODO
+
+    - name: Prepare release
+      run: |
+        mkdir release
+        mv ./*.deb release
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: debian-latest
+        path: release

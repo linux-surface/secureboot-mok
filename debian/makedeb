@@ -10,4 +10,3 @@ cd "${basedir}"
 wget -O "MOK.cer" ${source}
 
 dpkg-buildpackage -b
-dpkg-sig --sign builder ../*.deb
