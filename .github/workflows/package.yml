@@ -77,14 +77,23 @@ jobs:
         su nobody --pty -p -s /bin/bash -c 'makepkg -f --noconfirm --nodeps'
 
     - name: Sign package
+      env:
+        GPG_KEY_ID: 56C464BAAC421453
+        GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
       run: |
-        echo TODO
+        cd arch
+
+        # import GPG key
+        echo "$GPG_KEY" | base64 -d | gpg --import --no-tty --batch --yes
+        export GPG_TTY=$(tty)
+
+        # sign packages
+        ls *.pkg.tar.zst | xargs -L1 gpg --detach-sign --batch --no-tty -u $GPG_KEY_ID
 
     - name: Prepare release
       run: |
         mkdir release
-        # mv arch/*pkg.tar.zst{,.sig} release
-        mv arch/*pkg.tar.zst release
+        mv arch/*pkg.tar.zst{,.sig} release
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v1
