@@ -2,8 +2,8 @@
 set -e
 
 post_upgrade() {
-    local backup="/tmp/linux-surface-secureboot.qzed.mok.backup"
-    local original="/usr/share/linux-surface-secureboot/qzed.mok"
+    local backup="/tmp/linux-surface-secureboot.surface.cer.backup"
+    local original="/usr/share/linux-surface-secureboot/surface.cer"
 
     if ! cmp --silent "${original}" "${backup}"; then
         # certificate has changed and needs re-enrollment
@@ -24,7 +24,7 @@ post_upgrade() {
 }
 
 post_install() {
-    local original="/usr/share/linux-surface-secureboot/qzed.mok"
+    local original="/usr/share/linux-surface-secureboot/surface.cer"
 
     echo ""
     echo "The secure-boot certificate has been installed to"
@@ -51,8 +51,8 @@ post_install() {
 }
 
 configure() {
-    local backup="/tmp/linux-surface-secureboot.qzed.mok.backup"
-    local original="/usr/share/linux-surface-secureboot/qzed.mok"
+    local backup="/tmp/linux-surface-secureboot.surface.cer.backup"
+    local original="/usr/share/linux-surface-secureboot/surface.cer"
 
     if test -f "${backup}"; then
         post_upgrade

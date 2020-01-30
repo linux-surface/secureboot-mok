@@ -2,7 +2,7 @@ post_install() {
     echo ""
     echo "The secure-boot certificate has been installed to"
     echo ""
-    echo "    /usr/share/linux-surface-secureboot/qzed.mok"
+    echo "    /usr/share/linux-surface-secureboot/surface.cer"
     echo ""
     echo "It will now be automatically enrolled for you and guarded with the password"
     echo ""
@@ -11,7 +11,7 @@ post_install() {
 
     local hashfile=$(mktemp)
     mokutil --generate-hash=surface > ${hashfile}
-    mokutil --hash-file ${hashfile} --import /usr/share/linux-surface-secureboot/qzed.mok
+    mokutil --hash-file ${hashfile} --import /usr/share/linux-surface-secureboot/surface.cer
 
     echo "To finish the enrollment process you need to reboot, where you will then be"
     echo "asked to enroll the certificate. During the import, you will be prompted for"
@@ -28,12 +28,12 @@ pre_remove() {
     echo "The following secure-boot certificate will be uninstalled and revoked from"
     echo "your system"
     echo ""
-    echo "    /usr/share/linux-surface-secureboot/qzed.mok"
+    echo "    /usr/share/linux-surface-secureboot/surface.cer"
     echo ""
 
     local hashfile=$(mktemp)
     mokutil --generate-hash=surface > ${hashfile}
-    mokutil --hash-file ${hashfile} --delete /usr/share/linux-surface-secureboot/qzed.mok
+    mokutil --hash-file ${hashfile} --delete /usr/share/linux-surface-secureboot/surface.cer
 
     echo "The key will be revoked on the next start of your system. You will then"
     echo "again asked for the password. Enter 'surface' to confirm."
@@ -45,15 +45,15 @@ pre_remove() {
 }
 
 pre_upgrade() {
-    local backup="/tmp/linux-surface-secureboot.qzed.mok.backup"
-    local original="/usr/share/linux-surface-secureboot/qzed.mok"
+    local backup="/tmp/linux-surface-secureboot.surface.cer.backup"
+    local original="/usr/share/linux-surface-secureboot/surface.cer"
 
     cp "${original}" "${backup}"
 }
 
 post_upgrade() {
-    local backup="/tmp/linux-surface-secureboot.qzed.mok.backup"
-    local original="/usr/share/linux-surface-secureboot/qzed.mok"
+    local backup="/tmp/linux-surface-secureboot.surface.cer.backup"
+    local original="/usr/share/linux-surface-secureboot/surface.cer"
 
     if ! cmp --silent "${original}" "${backup}"
     then

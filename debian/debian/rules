@@ -2,7 +2,7 @@
 pkgdir = debian/linux-surface-secureboot-mok
 
 override_dh_install:
-	install -D -m400 "MOK.cer" "${pkgdir}/usr/share/linux-surface-secureboot/qzed.mok"
+	install -D -m400 "surface.cer" "${pkgdir}/usr/share/linux-surface-secureboot/surface.cer"
 
 %:
 	dh $@
