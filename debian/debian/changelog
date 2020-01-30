@@ -1,3 +1,9 @@
+linux-surface-secureboot-mok (2.0.0) unstable; urgency=medium
+
+  * Switch to new certificate
+
+ -- Maximilian Luz <luzmaximilian@gmail.com>  Thu, 30 Jan 2020 21:28:08 +0100
+
 linux-surface-secureboot-mok (1.0.0) unstable; urgency=medium
 
   * Initial release.
