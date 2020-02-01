@@ -1,13 +1,14 @@
 on:
   push:
-    branches:
-      - feature/ci
+    tags:
+      - v[0-9]+.*
+      - testing-ci.*
 
 name: Build Packages
 
 jobs:
-  deb:
-    name: Debian
+  build-deb:
+    name: Build Debian package
     runs-on: ubuntu-latest
     container: debian:sid
 
@@ -48,8 +49,8 @@ jobs:
         name: debian-latest
         path: release
 
-  arch:
-    name: Arch Linux
+  build-arch:
+    name: Build Arch Linux package
     runs-on: ubuntu-latest
     container: archlinux
 
@@ -100,3 +101,27 @@ jobs:
       with:
         name: arch-latest
         path: release
+
+  release:
+    name: Publish release
+    needs: [build-deb, build-arch]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Debian artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: debian-latest
+
+    - name: Download Arch Linux artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: arch-latest
+
+    - name: Upload assets
+      uses: svenstaro/upload-release-action@v1-release
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./*-latest/*
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
