@@ -1,5 +1,7 @@
 *.pkg.tar.xz
 *.pkg.tar.xz.sig
 *.cer
+*.rpm
+.build
 src
 pkg

@@ -6,6 +6,9 @@ on:
 
 name: Build Packages
 
+env:
+  GPG_KEY_ID: 56C464BAAC421453
+
 jobs:
   build-deb:
     name: Build Debian package
@@ -28,7 +31,6 @@ jobs:
 
     - name: Sign package
       env:
-        GPG_KEY_ID: 56C464BAAC421453
         GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
       run: |
         # import GPG key
@@ -79,7 +81,6 @@ jobs:
 
     - name: Sign package
       env:
-        GPG_KEY_ID: 56C464BAAC421453
         GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
       run: |
         cd arch
@@ -102,9 +103,87 @@ jobs:
         name: arch-latest
         path: release
 
+  build-f31:
+    name: Build Fedora 31 package
+    runs-on: ubuntu-latest
+    container: fedora:31
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install build dependencies
+      run: |
+        dnf distro-sync -y
+        dnf install -y rpmdevtools rpm-sign 'dnf-command(builddep)'
+        dnf builddep -y fedora/surface-secureboot/surface-secureboot.spec
+
+    - name: Build package
+      run: |
+        cd fedora/surface-secureboot
+
+        # Build the .rpm packages
+        ../makerpm
+
+    - name: Sign packages
+      env:
+        GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
+      run: |
+        cd fedora/surface-secureboot/out/x86_64
+
+        # import GPG key
+        echo "$GPG_KEY" | base64 -d | gpg --import --no-tty --batch --yes
+
+        # sign packages
+        rpm --resign *.rpm --define "_gpg_name $GPG_KEY_ID"
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: fedora-31-latest
+        path: fedora/surface-secureboot/out/noarch
+
+  build-f30:
+    name: Build Fedora 30 package
+    runs-on: ubuntu-latest
+    container: fedora:30
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install build dependencies
+      run: |
+        dnf distro-sync -y
+        dnf install -y rpmdevtools rpm-sign 'dnf-command(builddep)'
+        dnf builddep -y fedora/surface-secureboot/surface-secureboot.spec
+
+    - name: Build package
+      run: |
+        cd fedora/surface-secureboot
+
+        # Build the .rpm packages
+        ../makerpm
+
+    - name: Sign packages
+      env:
+        GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
+      run: |
+        cd fedora/surface-secureboot/out/x86_64
+
+        # import GPG key
+        echo "$GPG_KEY" | base64 -d | gpg --import --no-tty --batch --yes
+
+        # sign packages
+        rpm --resign *.rpm --define "_gpg_name $GPG_KEY_ID"
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: fedora-30-latest
+        path: fedora/surface-secureboot/out/noarch
+
   release:
     name: Publish release
-    needs: [build-deb, build-arch]
+    needs: [build-deb, build-arch, build-f31, build-f30]
     runs-on: ubuntu-latest
     steps:
     - name: Download Debian artifacts
@@ -116,6 +195,16 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: arch-latest
+
+    - name: Download Fedora 31 artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: fedora-31-latest
+
+    - name: Download Fedora 30 artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: fedora-30-latest
 
     - name: Upload assets
       uses: svenstaro/upload-release-action@v1-release
