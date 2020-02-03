@@ -115,7 +115,7 @@ jobs:
       run: |
         dnf distro-sync -y
         dnf install -y rpmdevtools rpm-sign 'dnf-command(builddep)'
-        dnf builddep -y fedora/surface-secureboot/surface-secureboot.spec
+        dnf builddep -y fedora/surface-secureboot.spec
 
     - name: Build package
       run: |
@@ -154,7 +154,7 @@ jobs:
       run: |
         dnf distro-sync -y
         dnf install -y rpmdevtools rpm-sign 'dnf-command(builddep)'
-        dnf builddep -y fedora/surface-secureboot/surface-secureboot.spec
+        dnf builddep -y fedora/surface-secureboot.spec
 
     - name: Build package
       run: |
