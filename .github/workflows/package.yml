@@ -119,16 +119,16 @@ jobs:
 
     - name: Build package
       run: |
-        cd fedora/surface-secureboot
+        cd fedora
 
         # Build the .rpm packages
-        ../makerpm
+        ./makerpm
 
     - name: Sign packages
       env:
         GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
       run: |
-        cd fedora/surface-secureboot/out/x86_64
+        cd fedora/out/x86_64
 
         # import GPG key
         echo "$GPG_KEY" | base64 -d | gpg --import --no-tty --batch --yes
@@ -140,7 +140,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: fedora-31-latest
-        path: fedora/surface-secureboot/out/noarch
+        path: fedora/out/noarch
 
   build-f30:
     name: Build Fedora 30 package
@@ -158,16 +158,16 @@ jobs:
 
     - name: Build package
       run: |
-        cd fedora/surface-secureboot
+        cd fedora
 
         # Build the .rpm packages
-        ../makerpm
+        ./makerpm
 
     - name: Sign packages
       env:
         GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
       run: |
-        cd fedora/surface-secureboot/out/x86_64
+        cd fedora/out/x86_64
 
         # import GPG key
         echo "$GPG_KEY" | base64 -d | gpg --import --no-tty --batch --yes
@@ -179,7 +179,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: fedora-30-latest
-        path: fedora/surface-secureboot/out/noarch
+        path: fedora/out/noarch
 
   release:
     name: Publish release
