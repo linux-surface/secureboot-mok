@@ -1,3 +1,9 @@
+linux-surface-secureboot-mok (2.0.0-2) unstable; urgency=medium
+
+  * Bump pkgrel
+
+ -- Dorian Stoll <dorian.stoll@tmsp.io>  Tue, 31 Mar 2020 14:22:26 +0200
+
 linux-surface-secureboot-mok (2.0.0) unstable; urgency=medium
 
   * Switch to new certificate

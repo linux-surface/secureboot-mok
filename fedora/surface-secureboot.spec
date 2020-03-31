@@ -5,7 +5,7 @@
 
 Name:       surface-secureboot
 Version:    20200202
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    The secureboot certificate for linux-surface
 
 License:    proprietary
@@ -108,5 +108,8 @@ fi
 %{sb_cert_dir}/%{sb_cert}
 
 %changelog
+* Tue Mar 31 2020 Dorian Stoll <dorian.stoll@tmsp.io> 20200202-2
+- Bump pkgrel
+
 * Sun Feb 02 2020 Dorian Stoll <dorian.stoll@tmsp.io>
 - Initial version
