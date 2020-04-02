@@ -1,3 +1,9 @@
+linux-surface-secureboot-mok (20200402-1) unstable; urgency=medium
+
+  * Bump package version to align across distributions
+
+ -- Dorian Stoll <dorian.stoll@tmsp.io>  Thu, 02 Apr 2020 14:11:26 +0200
+
 linux-surface-secureboot-mok (2.0.0-2) unstable; urgency=medium
 
   * Bump pkgrel

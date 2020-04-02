@@ -4,8 +4,8 @@
 %global sb_cert_dir /usr/share/surface-secureboot
 
 Name:       surface-secureboot
-Version:    20200202
-Release:    2%{?dist}
+Version:    20200402
+Release:    1%{?dist}
 Summary:    The secureboot certificate for linux-surface
 
 License:    proprietary
@@ -108,6 +108,9 @@ fi
 %{sb_cert_dir}/%{sb_cert}
 
 %changelog
+* Thu Apr 02 2020 Dorian Stoll <dorian.stoll@tmsp.io> 20200402-1
+- Bump package version to align across distributions
+
 * Tue Mar 31 2020 Dorian Stoll <dorian.stoll@tmsp.io> 20200202-2
 - Bump pkgrel
 

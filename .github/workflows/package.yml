@@ -1,8 +1,7 @@
 on:
   push:
     tags:
-      - v[0-9]+.*
-      - testing-ci.*
+      - '**'
 
 name: Build Packages
 
