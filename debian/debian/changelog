@@ -1,3 +1,9 @@
+linux-surface-secureboot-mok (20200929-1) unstable; urgency=medium
+
+  * Bump release to build for Fedora 33
+
+ -- Dorian Stoll <dorian.stoll@tmsp.io>  Tue, 29 Sep 2020 18:39:11 +0200
+
 linux-surface-secureboot-mok (20200402-1) unstable; urgency=medium
 
   * Bump package version to align across distributions
