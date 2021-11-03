@@ -1,3 +1,9 @@
+linux-surface-secureboot-mok (20211103-1) unstable; urgency=medium
+
+  * Bump release to build for Fedora 35
+
+ -- Dorian Stoll <dorian.stoll@tmsp.io>  Wed, 03 Nov 2021 20:18:00 +0100
+
 linux-surface-secureboot-mok (20210319-1) unstable; urgency=medium
 
   * Bump release to build for Fedora 34
