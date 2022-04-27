@@ -1,3 +1,9 @@
+linux-surface-secureboot-mok (20220427-1) unstable; urgency=medium
+
+  * Bump release to build for Fedora 36
+
+ -- Dorian Stoll <dorian.stoll@tmsp.io>  Wed, 27 Apr 2022 22:36:00 +0200
+
 linux-surface-secureboot-mok (20211103-1) unstable; urgency=medium
 
   * Bump release to build for Fedora 35
