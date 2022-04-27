@@ -102,6 +102,47 @@ jobs:
         name: arch-latest
         path: release
 
+  build-f36:
+    name: Build Fedora 36 package
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:36
+      options: --security-opt seccomp=unconfined
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install build dependencies
+      run: |
+        dnf distro-sync -y
+        dnf install -y rpmdevtools rpm-sign 'dnf-command(builddep)'
+        dnf builddep -y fedora/surface-secureboot.spec
+
+    - name: Build package
+      run: |
+        cd fedora
+
+        # Build the .rpm packages
+        ./makerpm
+
+    - name: Sign packages
+      env:
+        GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
+      run: |
+        cd fedora/out/noarch
+
+        # import GPG key
+        echo "$GPG_KEY" | base64 -d | gpg --import --no-tty --batch --yes
+
+        # sign packages
+        rpm --resign *.rpm --define "_gpg_name $GPG_KEY_ID"
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v1
+      with:
+        name: fedora-36-latest
+        path: fedora/out/noarch
+
   build-f35:
     name: Build Fedora 35 package
     runs-on: ubuntu-latest
@@ -182,48 +223,9 @@ jobs:
         name: fedora-34-latest
         path: fedora/out/noarch
 
-  build-f33:
-    name: Build Fedora 33 package
-    runs-on: ubuntu-latest
-    container: fedora:33
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Install build dependencies
-      run: |
-        dnf distro-sync -y
-        dnf install -y rpmdevtools rpm-sign 'dnf-command(builddep)'
-        dnf builddep -y fedora/surface-secureboot.spec
-
-    - name: Build package
-      run: |
-        cd fedora
-
-        # Build the .rpm packages
-        ./makerpm
-
-    - name: Sign packages
-      env:
-        GPG_KEY: ${{ secrets.SURFACE_GPG_KEY }}
-      run: |
-        cd fedora/out/noarch
-
-        # import GPG key
-        echo "$GPG_KEY" | base64 -d | gpg --import --no-tty --batch --yes
-
-        # sign packages
-        rpm --resign *.rpm --define "_gpg_name $GPG_KEY_ID"
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v1
-      with:
-        name: fedora-33-latest
-        path: fedora/out/noarch
-
   release:
     name: Publish release
-    needs: [build-deb, build-arch, build-f35, build-f34, build-f33]
+    needs: [build-deb, build-arch, build-f36, build-f35, build-f34]
     runs-on: ubuntu-latest
     steps:
     - name: Download Debian artifacts
@@ -235,6 +237,11 @@ jobs:
       uses: actions/download-artifact@v1
       with:
         name: arch-latest
+
+    - name: Download Fedora 36 artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: fedora-36-latest
 
     - name: Download Fedora 35 artifacts
       uses: actions/download-artifact@v1
@@ -360,6 +367,58 @@ jobs:
         git commit -m "Update Arch Linux secure-boot MOK"
         git push --set-upstream origin "${update_branch}"
 
+  repo-f36:
+    name: Update Fedora 36 package repository
+    needs: [release]
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:36
+      options: --security-opt seccomp=unconfined
+    steps:
+    - name: Install dependencies
+      run: |
+        dnf install -y git findutils
+
+    - name: Download artifacts
+      uses: actions/download-artifact@v1
+      with:
+        name: fedora-36-latest
+
+    - name: Update repository
+      env:
+        SURFACEBOT_TOKEN: ${{ secrets.GITHUB_BOT_TOKEN }}
+        BRANCH_STAGING: u/staging
+        GIT_REF: ${{ github.ref }}
+      run: |
+        repo="https://surfacebot:${SURFACEBOT_TOKEN}@github.com/linux-surface/repo.git"
+
+        # clone package repository
+        git clone -b "${BRANCH_STAGING}" "${repo}" repo
+
+        # copy packages
+        cp fedora-36-latest/* repo/fedora/f36
+        cd repo/fedora/f36
+
+        # parse git tag from ref
+        GIT_TAG=$(echo $GIT_REF | sed 's|^refs/tags/||g')
+
+        # convert packages into references
+        for pkg in $(find . -name '*.rpm'); do
+          echo "secureboot-mok:$GIT_TAG/$(basename $pkg)" > $pkg.blob
+          rm $pkg
+        done
+
+        # set git identity
+        git config --global user.email "surfacebot@users.noreply.github.com"
+        git config --global user.name "surfacebot"
+
+        # commit and push
+        update_branch="${BRANCH_STAGING}-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
+        git checkout -b "${update_branch}"
+        git add .
+        git commit -m "Update Fedora 36 secure-boot MOK"
+        git push --set-upstream origin "${update_branch}"
+
   repo-f35:
     name: Update Fedora 35 package repository
     needs: [release]
@@ -460,54 +519,4 @@ jobs:
         git checkout -b "${update_branch}"
         git add .
         git commit -m "Update Fedora 34 secure-boot MOK"
-        git push --set-upstream origin "${update_branch}"
-
-  repo-f33:
-    name: Update Fedora 33 package repository
-    needs: [release]
-    runs-on: ubuntu-latest
-    container: fedora:33
-    steps:
-    - name: Install dependencies
-      run: |
-        dnf install -y git findutils
-
-    - name: Download artifacts
-      uses: actions/download-artifact@v1
-      with:
-        name: fedora-33-latest
-
-    - name: Update repository
-      env:
-        SURFACEBOT_TOKEN: ${{ secrets.GITHUB_BOT_TOKEN }}
-        BRANCH_STAGING: u/staging
-        GIT_REF: ${{ github.ref }}
-      run: |
-        repo="https://surfacebot:${SURFACEBOT_TOKEN}@github.com/linux-surface/repo.git"
-
-        # clone package repository
-        git clone -b "${BRANCH_STAGING}" "${repo}" repo
-
-        # copy packages
-        cp fedora-33-latest/* repo/fedora/f33
-        cd repo/fedora/f33
-
-        # parse git tag from ref
-        GIT_TAG=$(echo $GIT_REF | sed 's|^refs/tags/||g')
-
-        # convert packages into references
-        for pkg in $(find . -name '*.rpm'); do
-          echo "secureboot-mok:$GIT_TAG/$(basename $pkg)" > $pkg.blob
-          rm $pkg
-        done
-
-        # set git identity
-        git config --global user.email "surfacebot@users.noreply.github.com"
-        git config --global user.name "surfacebot"
-
-        # commit and push
-        update_branch="${BRANCH_STAGING}-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
-        git checkout -b "${update_branch}"
-        git add .
-        git commit -m "Update Fedora 33 secure-boot MOK"
         git push --set-upstream origin "${update_branch}"
