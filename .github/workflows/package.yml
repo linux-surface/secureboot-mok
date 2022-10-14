@@ -184,10 +184,10 @@ jobs:
         name: fedora-35-latest
         path: fedora/out/noarch
 
-  build-f34:
-    name: Build Fedora 34 package
+  build-f37:
+    name: Build Fedora 37 package
     runs-on: ubuntu-latest
-    container: fedora:34
+    container: registry.fedoraproject.org/fedora:37
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -220,12 +220,12 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: fedora-34-latest
+        name: fedora-37-latest
         path: fedora/out/noarch
 
   release:
     name: Publish release
-    needs: [build-deb, build-arch, build-f36, build-f35, build-f34]
+    needs: [build-deb, build-arch, build-f36, build-f35, build-f37]
     runs-on: ubuntu-latest
     steps:
     - name: Download Debian artifacts
@@ -248,10 +248,10 @@ jobs:
       with:
         name: fedora-35-latest
 
-    - name: Download Fedora 34 artifacts
+    - name: Download Fedora 37 artifacts
       uses: actions/download-artifact@v1
       with:
-        name: fedora-34-latest
+        name: fedora-37-latest
 
     - name: Upload assets
       uses: svenstaro/upload-release-action@v1-release
@@ -466,11 +466,11 @@ jobs:
         git commit -m "Update Fedora 35 secure-boot MOK"
         git push --set-upstream origin "${update_branch}"
 
-  repo-f34:
-    name: Update Fedora 34 package repository
+  repo-f37:
+    name: Update Fedora 37 package repository
     needs: [release]
     runs-on: ubuntu-latest
-    container: fedora:34
+    container: registry.fedoraproject.org/fedora:37
     steps:
     - name: Install dependencies
       run: |
@@ -479,7 +479,7 @@ jobs:
     - name: Download artifacts
       uses: actions/download-artifact@v1
       with:
-        name: fedora-34-latest
+        name: fedora-37-latest
 
     - name: Update repository
       env:
@@ -493,8 +493,8 @@ jobs:
         git clone -b "${BRANCH_STAGING}" "${repo}" repo
 
         # copy packages
-        cp fedora-34-latest/* repo/fedora/f34
-        cd repo/fedora/f34
+        cp fedora-37-latest/* repo/fedora/f37
+        cd repo/fedora/f37
 
         # parse git tag from ref
         GIT_TAG=$(echo $GIT_REF | sed 's|^refs/tags/||g')
@@ -513,5 +513,5 @@ jobs:
         update_branch="${BRANCH_STAGING}-$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)"
         git checkout -b "${update_branch}"
         git add .
-        git commit -m "Update Fedora 34 secure-boot MOK"
+        git commit -m "Update Fedora 37 secure-boot MOK"
         git push --set-upstream origin "${update_branch}"
