@@ -1,3 +1,9 @@
+linux-surface-secureboot-mok (20221014-1) unstable; urgency=medium
+
+  * Bump release to build for Fedora 37
+
+ -- Maximilian Luz <luzmaximilian@gmail.com>  Fri, 14 Oct 2022 20:54:04 +0200
+
 linux-surface-secureboot-mok (20220427-1) unstable; urgency=medium
 
   * Bump release to build for Fedora 36
