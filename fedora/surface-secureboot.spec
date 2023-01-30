@@ -4,7 +4,7 @@
 %global sb_cert_dir /usr/share/surface-secureboot
 
 Name:       surface-secureboot
-Version:    20221014
+Version:    20230130
 Release:    1%{?dist}
 Summary:    The secureboot certificate for linux-surface
 
@@ -184,6 +184,9 @@ fi
 %{sb_cert_dir}/%{sb_cert}
 
 %changelog
+* Mon Jan 30 2022 Maximilian Luz <luzmaximilian@gmail.com> - 20230130-1
+- Check if efivarfs has been mounted before attempting to enroll via mokutil
+
 * Fri Oct 14 2022 Maximilian Luz <luzmaximilian@gmail.com> - 20220427-1
 - Bump release to build for Fedora 37
 

@@ -1,3 +1,9 @@
+linux-surface-secureboot-mok (20230130-1) unstable; urgency=medium
+
+  * Check if efivarfs has been mounted before attempting to enroll via mokutil
+
+ -- Maximilian Luz <luzmaximilian@gmail.com>  Mon, 30 Jan 2023 14:45:57 +0100
+
 linux-surface-secureboot-mok (20221014-1) unstable; urgency=medium
 
   * Bump release to build for Fedora 37
