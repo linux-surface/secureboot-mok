@@ -4,8 +4,30 @@ set -e
 post_upgrade() {
     local backup="/tmp/linux-surface-secureboot.surface.cer.backup"
     local original="/usr/share/linux-surface-secureboot/surface.cer"
+    local hashfile
 
     if ! cmp --silent "${original}" "${backup}"; then
+        # check if efivarfs has been mounted
+        if ! mount -l | grep --quiet "efivarfs"; then
+            echo "The 'efivarfs' filesystem has not been mounted. Please update the key in"
+            echo "UEFI key store manually."
+            echo ""
+            echo "You can do this by, e.g., mounting efivarfs via"
+            echo ""
+            echo "    mount -t efivarfs none /sys/firmware/efi/efivars"
+            echo ""
+            echo "and running mokutil via"
+            echo ""
+            echo "    mokutil --delete ${backup}"
+            echo "    mokutil --import ${original}"
+            echo ""
+            echo "The key will be updated on the next start of your system. You will then"
+            echo "be asked to confirm the key and enter the (temporary) password you chose"
+            echo "when running the commands above."
+            echo ""
+            return
+        fi
+
         # certificate has changed and needs re-enrollment
         echo ""
         echo "Updating secure boot certificate. The old key will be revoked and a new key"
@@ -14,10 +36,10 @@ post_upgrade() {
         echo "this is the right key and confirm with the password 'surface'."
         echo ""
 
-        local hashfile=$(mktemp)
-        mokutil --generate-hash=surface > ${hashfile}
-        mokutil --hash-file ${hashfile} --delete ${backup}
-        mokutil --hash-file ${hashfile} --import ${original}
+        hashfile=$(mktemp)
+        mokutil --generate-hash=surface > "${hashfile}"
+        mokutil --hash-file "${hashfile}" --delete ${backup}
+        mokutil --hash-file "${hashfile}" --import ${original}
     fi
 
     rm -f "${backup}"
@@ -25,20 +47,44 @@ post_upgrade() {
 
 post_install() {
     local original="/usr/share/linux-surface-secureboot/surface.cer"
+    local hashfile
 
     echo ""
     echo "The secure-boot certificate has been installed to"
     echo ""
     echo "    ${original}"
     echo ""
+
+    # check if efivarfs has been mounted
+    if ! mount -l | grep --quiet "efivarfs"; then
+        echo "The 'efivarfs' filesystem has not been mounted. Please add the key to the"
+        echo "UEFI key store manually."
+        echo ""
+        echo "You can do this by, e.g., mounting efivarfs via"
+        echo ""
+        echo "    mount -t efivarfs none /sys/firmware/efi/efivars"
+        echo ""
+        echo "and running mokutil via"
+        echo ""
+        echo "    mokutil --import ${original}"
+        echo ""
+        echo "To finish the enrollment process you then need to reboot, where you will be"
+        echo "asked to enroll the certificate. During the import, you will be prompted for"
+        echo "the (temporary) password you chose when asked in the commands above. Please"
+        echo "make sure that you are indeed adding the right key and confirm by entering"
+        echo "your chosen password."
+        echo ""
+        return
+    fi
+
     echo "It will now be automatically enrolled for you and guarded with the password"
     echo ""
     echo "    surface"
     echo ""
 
-    local hashfile=$(mktemp)
-    mokutil --generate-hash=surface > ${hashfile}
-    mokutil --hash-file ${hashfile} --import ${original}
+    hashfile=$(mktemp)
+    mokutil --generate-hash=surface > "${hashfile}"
+    mokutil --hash-file "${hashfile}" --import ${original}
 
     echo "To finish the enrollment process you need to reboot, where you will then be"
     echo "asked to enroll the certificate. During the import, you will be prompted for"

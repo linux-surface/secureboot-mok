@@ -2,23 +2,56 @@
 set -e
 
 pre_remove() {
+    local backup="/tmp/linux-surface-secureboot.surface.cer.backup"
+    local original="/usr/share/linux-surface-secureboot/surface.cer"
+    local hashfile
+
+    # check if efivarfs has been mounted
+    if ! mount -l | grep --quiet "efivarfs"; then
+        cp "${original}" "${backup}"
+
+        echo ""
+        echo "The 'efivarfs' filesystem has not been mounted. Please remove the key from"
+        echo "the UEFI key store manually."
+        echo ""
+        echo "You can do this by, e.g., mounting efivarfs via"
+        echo ""
+        echo "    mount -t efivarfs none /sys/firmware/efi/efivars"
+        echo ""
+        echo "and running mokutil via"
+        echo ""
+        echo "    mokutil --delete ${backup}"
+        echo ""
+        echo "The key will be revoked on the next start of your system. You will then"
+        echo "be asked to confirm the key and enter the (temporary) password you chose"
+        echo "when running the command above."
+        echo ""
+        echo "Note: The key has been backed up to temporary storage at"
+        echo ""
+        echo "    ${backup}"
+        echo ""
+        echo "It may be gone after the next reboot."
+        echo ""
+        return
+    fi
+
     echo ""
     echo "The following secure-boot certificate will be uninstalled and revoked from"
     echo "your system"
     echo ""
-    echo "    /usr/share/linux-surface-secureboot/surface.cer"
+    echo "    ${original}"
     echo ""
 
-    local hashfile=$(mktemp)
-    mokutil --generate-hash=surface > ${hashfile}
-    mokutil --hash-file ${hashfile} --delete /usr/share/linux-surface-secureboot/surface.cer
+    hashfile=$(mktemp)
+    mokutil --generate-hash=surface > "${hashfile}"
+    mokutil --hash-file "${hashfile}" --delete "${original}"
 
     echo "The key will be revoked on the next start of your system. You will then"
-    echo "again asked for the password. Enter 'surface' to confirm."
+    echo "be asked again for the password. Enter 'surface' to confirm."
     echo ""
-    echo "Kernels signed with the corresponding private key will still not be allowed"
-    echo "to boot after this. Note that you can always manage your secure-boot keys"
-    echo "via the 'mokutil' tool. Please refer to 'man mokutil' for more information."
+    echo "Kernels signed with the corresponding private key will not be allowed to"
+    echo "boot after this. Note that you can always manage your secure-boot keys via"
+    echo "the 'mokutil' tool. Please refer to 'man mokutil' for more information."
     echo ""
 }
 

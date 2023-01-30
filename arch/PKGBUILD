@@ -7,7 +7,7 @@ pkgdesc='Secure-boot machine owner key for linux-surface kernels'
 url='https://github.com/linux-surface/linux-surface'
 license=('MIT')
 arch=('any')
-depends=('mokutil')
+depends=('mokutil' 'grep')
 install="${pkgname}.install"
 
 _commit="d8887bc8ce14a47d5b9d45f6697f05d53e43fe9a"

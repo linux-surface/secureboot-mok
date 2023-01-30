@@ -6,5 +6,5 @@ Build-Depends: build-essential, debhelper (>= 10)
 
 Package: linux-surface-secureboot-mok
 Architecture: amd64
-Depends: mokutil
+Depends: mokutil, grep
 Description: Secure-boot machine owner key for linux-surface kernels
