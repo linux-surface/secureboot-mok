@@ -12,7 +12,7 @@ jobs:
   build-deb:
     name: Build Debian package
     runs-on: ubuntu-latest
-    container: debian:sid
+    container: ubuntu:20.04
 
     steps:
     - name: Checkout code
