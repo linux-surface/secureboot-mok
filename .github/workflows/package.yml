@@ -16,7 +16,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install build dependencies
       env:
@@ -47,7 +47,7 @@ jobs:
         mv ./*.deb release
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: debian-latest
         path: release
@@ -59,7 +59,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install build dependencies
       run: |
@@ -99,7 +99,7 @@ jobs:
         mv arch/*pkg.tar.zst{,.sig} release
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: arch-latest
         path: release
@@ -110,7 +110,7 @@ jobs:
     container: registry.fedoraproject.org/fedora:39
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install build dependencies
       run: |
@@ -138,7 +138,7 @@ jobs:
         rpm --resign *.rpm --define "_gpg_name $GPG_KEY_ID"
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: fedora-39-latest
         path: fedora/out/noarch
@@ -149,7 +149,7 @@ jobs:
     container: registry.fedoraproject.org/fedora:40
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install build dependencies
       run: |
@@ -177,7 +177,7 @@ jobs:
         rpm --resign *.rpm --define "_gpg_name $GPG_KEY_ID"
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: fedora-40-latest
         path: fedora/out/noarch
@@ -188,7 +188,7 @@ jobs:
     container: registry.fedoraproject.org/fedora:41
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install build dependencies
       run: |
@@ -216,7 +216,7 @@ jobs:
         rpm --resign *.rpm --define "_gpg_name $GPG_KEY_ID"
 
     - name: Upload artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: fedora-41-latest
         path: fedora/out/noarch
@@ -227,31 +227,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download Debian artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: debian-latest
         path: debian-latest
 
     - name: Download Arch Linux artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: arch-latest
         path: arch-latest
 
     - name: Download Fedora 39 artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: fedora-39-latest
         path: fedora-39-latest
 
     - name: Download Fedora 40 artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: fedora-40-latest
         path: fedora-40-latest
 
     - name: Download Fedora 41 artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: fedora-41-latest
         path: fedora-41-latest
@@ -277,7 +277,7 @@ jobs:
         apt-get install -y git
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: debian-latest
         path: debian-latest
@@ -327,7 +327,7 @@ jobs:
       run: pacman -Sy --noconfirm git
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: arch-latest
         path: arch-latest
@@ -378,7 +378,7 @@ jobs:
         dnf install -y git findutils
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: fedora-39-latest
         path: fedora-39-latest
@@ -429,7 +429,7 @@ jobs:
         dnf install -y git findutils
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: fedora-40-latest
         path: fedora-40-latest
@@ -481,7 +481,7 @@ jobs:
         dnf install -y git findutils
 
     - name: Download artifacts
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: fedora-41-latest
         path: fedora-41-latest
