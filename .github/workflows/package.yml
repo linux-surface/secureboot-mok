@@ -78,7 +78,7 @@ jobs:
         export COMPRESSZST=(zstd -c -T0 --ultra -20 -)
 
         # Build
-        su nobody --pty -p -s /bin/bash -c 'makepkg -f --noconfirm --nodeps'
+        runuser -u nobody -- makepkg -f --noconfirm --nodeps
 
     - name: Sign package
       env:
