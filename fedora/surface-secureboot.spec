@@ -4,7 +4,7 @@
 %global sb_cert_dir /usr/share/surface-secureboot
 
 Name:       surface-secureboot
-Version:    20250420
+Version:    20251230
 Release:    1%{?dist}
 Summary:    The secureboot certificate for linux-surface
 
@@ -184,6 +184,9 @@ fi
 %{sb_cert_dir}/%{sb_cert}
 
 %changelog
+* Tue Dec 30 2025 Maximilian Luz <luzmaximilian@gmail.com> - 20251230-1
+- Bump release to build for Fedora 43
+
 * Sun Apr 20 2025 Maximilian Luz <luzmaximilian@gmail.com> - 20250420-1
 - Bump release to build for Fedora 42
 
