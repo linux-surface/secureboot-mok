@@ -1,3 +1,9 @@
+linux-surface-secureboot-mok (20261018-1) unstable; urgency=medium
+
+  * Bump release to build for Fedora 44 and 45
+
+ -- Maximilian Luz <luzmaximilian@gmail.com>  Sun, 18 Oct 2026 18:40:38 +0200
+
 linux-surface-secureboot-mok (20251230-1) unstable; urgency=medium
 
   * Bump release to build for Fedora 43
